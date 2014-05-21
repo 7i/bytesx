@@ -1,4 +1,4 @@
-// Package bytesx implements highly optimized byte functions which extends the 
+// Package bytesx implements highly optimized byte functions which extends the
 // bytes package in the standard library (Currently x86 64-bit only)
 package bytesx
 
@@ -15,7 +15,7 @@ func IndexNotEqual(a, b []byte) int
 func EqualThreshold(a, b []byte, t uint8) bool
 
 // Fallback for 386 and arm
-func indexNotEqual(a, b []byte) int{
+func indexNotEqual(a, b []byte) int {
 	if &a[0] == &b[0] {
 		return -1
 	}
@@ -25,7 +25,7 @@ func indexNotEqual(a, b []byte) int{
 	} else {
 		min = len(b)
 	}
-	for i:=0; i<min; i++ {
+	for i := 0; i < min; i++ {
 		if a[i] == b[i] {
 			continue
 		}
@@ -45,11 +45,11 @@ func equalThreshold(a, b []byte, t uint8) bool {
 	} else {
 		min = len(b)
 	}
-	for i:=0; i<min; i++ {
+	for i := 0; i < min; i++ {
 		ai := int(a[i])
 		ti := int(t)
 		bi := int(b[i])
-		if  bi < ai + ti && bi > ai - ti {
+		if bi < ai+ti && bi > ai-ti {
 			continue
 		}
 		return false

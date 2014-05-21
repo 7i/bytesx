@@ -1,10 +1,10 @@
 package bytesx_test
 
 import (
-	"testing"
 	"fmt"
-	"github.com/mewkiz84/bytesx"
+	"github.com/7i/bytesx"
 	"syscall"
+	"testing"
 	"unsafe"
 )
 
@@ -69,7 +69,70 @@ func TestEqualThresholdNearPageBoundary(t *testing.T) {
 	}
 }
 
+func BenchmarkEqualThreshold0(b *testing.B) {
+	var buf [4]byte
+	buf1 := buf[0:0]
+	buf2 := buf[1:1]
+	for i := 0; i < b.N; i++ {
+		eq := bytesx.EqualThreshold(buf1, buf2, 1)
+		if !eq {
+			b.Fatal("bad equal")
+		}
+	}
+}
+
+var bmbuf []byte
+
+func BenchmarkEqualThreshold1(b *testing.B)    { bmEqualThreshold(b, bytesx.EqualThreshold, 1) }
+func BenchmarkEqualThreshold6(b *testing.B)    { bmEqualThreshold(b, bytesx.EqualThreshold, 6) }
+func BenchmarkEqualThreshold9(b *testing.B)    { bmEqualThreshold(b, bytesx.EqualThreshold, 9) }
+func BenchmarkEqualThreshold15(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 15) }
+func BenchmarkEqualThreshold16(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 16) }
+func BenchmarkEqualThreshold20(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 20) }
+func BenchmarkEqualThreshold32(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 32) }
+func BenchmarkEqualThreshold64(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 64) }
+func BenchmarkEqualThreshold128(b *testing.B)  { bmEqualThreshold(b, bytesx.EqualThreshold, 128) }
+func BenchmarkEqualThreshold256(b *testing.B)  { bmEqualThreshold(b, bytesx.EqualThreshold, 256) }
+func BenchmarkEqualThreshold512(b *testing.B)  { bmEqualThreshold(b, bytesx.EqualThreshold, 512) }
+func BenchmarkEqualThreshold1K(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 1<<10) }
+func BenchmarkEqualThreshold2K(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 2<<10) }
+func BenchmarkEqualThreshold4K(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 4<<10) }
+func BenchmarkEqualThreshold8K(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 8<<10) }
+func BenchmarkEqualThreshold16K(b *testing.B)  { bmEqualThreshold(b, bytesx.EqualThreshold, 16<<10) }
+func BenchmarkEqualThreshold64K(b *testing.B)  { bmEqualThreshold(b, bytesx.EqualThreshold, 64<<10) }
+func BenchmarkEqualThreshold1M(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 1<<20) }
+func BenchmarkEqualThreshold2M(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 2<<20) }
+func BenchmarkEqualThreshold4M(b *testing.B)   { bmEqualThreshold(b, bytesx.EqualThreshold, 4<<20) }
+func BenchmarkEqualThreshold64M(b *testing.B)  { bmEqualThreshold(b, bytesx.EqualThreshold, 64<<20) }
+func BenchmarkEqualThreshold128M(b *testing.B) { bmEqualThreshold(b, bytesx.EqualThreshold, 128<<20) }
+func BenchmarkEqualThreshold512M(b *testing.B) { bmEqualThreshold(b, bytesx.EqualThreshold, 512<<20) }
+
+func bmEqualThreshold(b *testing.B, equal func([]byte, []byte, uint8) bool, n int) {
+	if len(bmbuf) < 2*n {
+		bmbuf = make([]byte, 2*n)
+	}
+	b.SetBytes(int64(n))
+	buf1 := bmbuf[0:n]
+	buf2 := bmbuf[n : 2*n]
+	buf1[n-1] = 'x'
+	buf2[n-1] = 'x'
+	for i := 0; i < b.N; i++ {
+		eq := equal(buf1, buf2, 1)
+		if !eq {
+			b.Fatal("bad equal threshold")
+		}
+	}
+	buf1[n-1] = '\x00'
+	buf2[n-1] = '\x00'
+}
+
 func TestEqualThreshold(t *testing.T) {
+
+	size := 128
+	if testing.Short() {
+		size = 32
+	}
+
 	// Test special cases
 	if true != bytesx.EqualThreshold([]byte(""), []byte("X"), 0) {
 		t.Errorf("EqualThreshold test failed. String1: \"\" String2: \"X\" Threshold: 0")
@@ -84,7 +147,7 @@ func TestEqualThreshold(t *testing.T) {
 	fmt.Println("Testing all threshold values for strings up to 128 bytes")
 	fmt.Println("Total number of tests: 2'147'483'648")
 	fmt.Println("This will take 1-2 min")
-	for i := 1; i < 128; i++ {
+	for i := 1; i < size; i++ {
 		for a := 0; a < 256; a++ {
 			for b := 0; b < 256; b++ {
 				for th := 0; th < 256; th++ {
