@@ -52,7 +52,7 @@ TEXT ·HammingDistance(SB),7,$0
 
 hdHuge:
 //; Copy in 64 bytes of a and b in to the xmm registers X0 to X7
-	MOVOU (SI), X0	//;						MOVDQU on Sandy Bridge (m128, xmm) 1 cycles/instructions and 3 in latency
+	MOVOU (SI), X0	//;			MOVDQU on Sandy Bridge (m128, xmm) 1 cycles/instructions and 3 in latency
 	MOVOU 16(SI), X2
 	MOVOU 32(SI), X4
 	MOVOU 48(SI), X6
@@ -63,7 +63,7 @@ hdHuge:
 
 //; PCMPEQB will set X0, X2, X4 and X6 to only contain 0xFF if corresponding
 //; bytes in a and b are the same.
-	PCMPEQB X1, X0	//;						Sandy Bridge (xmm xmm) 0.5 cycles/instructions and 1 in latency
+	PCMPEQB X1, X0	//;			Sandy Bridge (xmm xmm) 0.5 cycles/instructions and 1 in latency
 	PCMPEQB X3, X2
 	PCMPEQB X5, X4
 	PCMPEQB X7, X6
@@ -71,14 +71,14 @@ hdHuge:
 //; PMOVMSKB takes the highest bit from every byte in X0, X2, X4 and X6
 //; respectivly and copys them in to the 16 least significant bits of
 //; R9, BX, CX and DX respectivly.
-	PMOVMSKB X0, R9	//;						Sandy Bridge (reg im) 1 cycles/instructions and 2 in latency
+	PMOVMSKB X0, R9	//;			Sandy Bridge (reg xmm) 1 cycles/instructions and 2 in latency
 	PMOVMSKB X2, BX
 	PMOVMSKB X4, CX
 	PMOVMSKB X6, DX
 
 //; Move all 64 resulting bits in to R9
-	SHLQ $48, R9	//;	XX______				Sandy Bridge (reg im) 0.5 cycles/instructions and 1 in latency
-	SHRQ $16, R9:BX	//;	XXXX____				Sandy Bridge (reg im im) 0.5 cycles/instructions
+	SHLQ $48, R9	//;	XX______	Sandy Bridge (reg im) 0.5 cycles/instructions and 1 in latency
+	SHRQ $16, R9:BX	//;	XXXX____	Sandy Bridge (reg im im) 0.5 cycles/instructions
 	SHRQ $16, R9:CX	//;	XXXXXX__
 	SHRQ $16, R9:DX	//;	XXXXXXXX
 
@@ -94,7 +94,7 @@ hdHuge:
 	ADDQ BX, AX
 
 //; Update the pointers and counter then jump back to the start of the loop.
-	ADDQ $64, SI 	//;						Sandy Bridge (reg im) 0.33 cycles/instructions and 1 in latency
+	ADDQ $64, SI 	//;			(ADD and SUB) Sandy Bridge (reg im) 0.33 cycles/instructions and 1 in latency
 	ADDQ $64, DI
 	SUBQ $64, R8
 
