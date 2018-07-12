@@ -2,7 +2,7 @@
 // bytes package in the standard library (Currently x86 64-bit only)
 package bytesx
 
-// HammingDistance returns the Hamming distance (number if non matching bytes)
+// HammingDistance returns the Hamming distance (number of non matching bytes)
 // between twostrings of the same length. HammingDistance will return -1 if the
 // strings are not of the same length or if the strings are of length 0. This
 // function uses sse2 instructions and the POPCNTQ instruction and will fallback
