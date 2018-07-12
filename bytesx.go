@@ -3,7 +3,7 @@
 package bytesx
 
 // HammingDistance returns the Hamming distance (number of non matching bytes)
-// between twostrings of the same length. HammingDistance will return -1 if the
+// between two strings of the same length. HammingDistance will return -1 if the
 // strings are not of the same length or if the strings are of length 0. This
 // function uses sse2 instructions and the POPCNTQ instruction and will fallback
 // to a pure GO implementation if any of these CPU fetures are not available.
