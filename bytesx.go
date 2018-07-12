@@ -2,11 +2,11 @@
 // bytes package in the standard library (Currently x86 64-bit only)
 package bytesx
 
-// HammingDistance returns the Hamming distance between two strings of the same
-// length. HammingDistance will return -1 if the strings are not of the same
-// length or if the strings are of length 0. This function uses sse2
-// instructions and the POPCNTQ instruction and will fallback to a pure GO
-// implementation if any of these CPU fetures are available.
+// HammingDistance returns the Hamming distance (number if non matching bytes)
+// between twostrings of the same length. HammingDistance will return -1 if the
+// strings are not of the same length or if the strings are of length 0. This
+// function uses sse2 instructions and the POPCNTQ instruction and will fallback
+// to a pure GO implementation if any of these CPU fetures are not available.
 func HammingDistance(a, b []byte) int
 
 // IndexNotEqual returns the index of the first non matching byte between a and
